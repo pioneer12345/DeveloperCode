@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>es6</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <style>            
+        </style>
+        <script>
+            // for (let i = 0; i < 10; i++) {   
+            //     alert(i); 
+            // }
+            // var arr = [];
+            // for (let i = 0; i < 10; i++) {
+            //     arr[i]=function(){
+            //         console.log(i);
+            //     }
+            // }
+            // arr[5]();
+            window.onload = function(){
+                var aInput = document.querySelectorAll('input');
+                for(let i=0;i<aInput.length;i++){
+                    aInput[i].onclick = function(){
+                        alert(i);
+                    }
+                }
+            }
+
+        </script>
+    </head>
+    <body>
+        <input type="button" value="aaa">
+        <input type="button" value="bbb">
+        <input type="button" value="ccc">
+    </body>
+</html>
