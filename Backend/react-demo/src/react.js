@@ -1,3 +1,5 @@
+import {updateComponent} from "./react-dom";
+
 export class Component{
   static isReactComponent = true;
   constructor(props){
@@ -13,11 +15,12 @@ export class Component{
   }
   forceUpdate(){
     this.state = this.updateQueue.reduce((accumulate,current)=>{
-      let nextState = typeof current == 'function'? current(this.state):current;
+      let nextState = typeof current == 'function'? current(accumulate):current;
       accumulate = {...accumulate,...nextState};
       return accumulate;
     },this.state);
     this.updateQueue.length = 0;
+    updateComponent(this);
   }
 }
 
