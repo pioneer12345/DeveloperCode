@@ -14,6 +14,10 @@ function render(element,container,componentInstance){
     let isReactComponent = type.isReactComponent;
     if(isReactComponent){
         componentInstance = new type(props);
+        if(props.ref1){
+            props.ref1.current = componentInstance;
+        }
+        if(componentInstance.componentWillMount) componentInstance.componentWillMount();
         element = componentInstance.render();
         type = element.type;
         props = element.props;
@@ -28,6 +32,9 @@ function render(element,container,componentInstance){
         componentInstance.dom = dom;   
     }
     container.appendChild(dom);
+    if(isReactComponent && componentInstance && componentInstance.componentDidMount){
+        componentInstance.componentDidMount();
+    }
 }
 
 function addEvent(dom,eventType,listener,componentInstance){
@@ -61,7 +68,7 @@ function createDOM(type,props,componentInstance){
     let dom = document.createElement(type);
     for(let propName in props){
         if(propName === 'children'){
-            if (typeof props.children=="object"){
+            if (props.children instanceof Array ){
                 props.children.forEach(child => render(child,dom,componentInstance));
             }else{
                 render(props.children,dom)
@@ -80,6 +87,18 @@ function createDOM(type,props,componentInstance){
         }
         else{
             dom.setAttribute(propName,props[propName]);
+        }    
+    }
+    if(props.ref1)
+    {
+        if(typeof props.ref1 == 'string'){
+            componentInstance.refs[props.ref1] = dom;
+        }
+        else if(typeof props.ref1 == 'function'){
+            props.ref1.call(componentInstance,dom);
+        }
+        else if(typeof props.ref1 == 'object'){
+            props.ref1.current = dom;
         }
     }
     return dom;
