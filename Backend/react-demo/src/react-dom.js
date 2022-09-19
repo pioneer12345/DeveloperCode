@@ -17,7 +17,7 @@ function render(element,container,componentInstance){
         if(props.ref1){
             props.ref1.current = componentInstance;
         }
-        if(componentInstance.componentWillMount) componentInstance.componentWillMount();
+        if(componentInstance.UNSAFE_componentWillMount) componentInstance.UNSAFE_componentWillMount();
         element = componentInstance.render();
         type = element.type;
         props = element.props;

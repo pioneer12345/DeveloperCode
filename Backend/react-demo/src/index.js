@@ -1,54 +1,84 @@
-import React from './react'; 
-import ReactDOM from './react-dom';
+import React from 'react'; 
+import ReactDOM from 'react-dom';
 
-function TextInput(props,ref1){
-  return <input ref1={ref1}></input>
-}
-
-const FowardTextInput = React.forwardRef(TextInput);
-
-
-class Form extends React.Component{
+class Counter extends React.Component{
+  static defaultProps = {name:"测试"};
   constructor(props){
     super(props);
-    this.textinput = React.createRef();
+    this.props = props;
+    this.state = {number:0};
+    console.log('1.开始初始化！');
   }
-   
-  getFocus=()=>{
-    this.textinput.current.focus();
-    this.textinput.current.value = 'focus';
+
+  UNSAFE_componentWillMount(){
+    console.log('2.组件将要挂载！');
+  }
+
+  componentDidMount(){
+    console.log('4.组件挂载完成！');
+  }
+
+  shouldComponentUpdate(nextProps,nextState){
+    return true;
+    console.log('5.询问组件是否应该更新！');
+    return nextState.number % 2 == 0;
+  }
+  
+  handleClick = ()=>{
+    this.setState({number:this.state.number+1});
+  }
+
+  UNSAFE_componentWillUpdate(){
+    console.log('6.组件将要更新！');
   }
 
   render(){
+    console.log('3.组件开始渲染！');
     return (
       <div>
-        <FowardTextInput ref1 = {this.textinput}></FowardTextInput>
-        <button onClick={this.getFocus}>获取焦点</button>
+        <p>{this.state.number}</p>
+        <button onClick={this.handleClick}>+</button>
+        <hr></hr>
+        {this.state.number>100?null:<SubCounter count={this.state.number} />}
       </div>
-    )
+    );
+  }
+
+  componentDidUpdate(){
+    console.log('7.组件更新完成！');
+  }
+
+}
+
+class SubCounter extends React.Component{
+
+  constructor(props){
+    super(props);
+    this.state = {count:0};
+  }
+
+  componentWillReceiveProps(){
+    console.log("1. 组件接收到属性");
+  }
+
+  static getDerivedStateFromProps(nextProps,prevState){
+    console.log("3. 从属性中获取继承的状态");
+    let {count} = nextProps;
+    return {count:prevState.count + count};
+  }
+
+  render(){
+    console.log("2. 组件开始渲染");
+    return(
+      <div>
+        {this.state.count}
+      </div>
+    );
+  }
+
+  componentWillUnmount(){
+    console.log('3.组件将要卸载');
   }
 }
 
-// function TextInput(props){
-//   return <input></input>;
-// }
-
-// class TextInput extends React.Component{
-
-//   constructor(props){
-//     super(props);
-//     this.input = React.createRef();
-//   }
-
-//   getFocus=()=>{
-//     this.input.current.focus();
-//     this.input.current.value = 'focus';
-//   }
-
-//   render(){
-//     return <input ref1={this.input}></input>
-//   }
-// }
-
-
-ReactDOM.render(<Form />,document.getElementById('root'));
+ReactDOM.render(<Counter />,document.getElementById('root'));

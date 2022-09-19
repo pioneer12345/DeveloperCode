@@ -26,9 +26,14 @@ export class Component{
       return accumulate;
     },this.state);
     this.updateQueue.length = 0;
-    updateComponent(this);
     this.callBack.forEach(cb=>cb());
     this.callBack.length = [];
+    if(this.shouldComponentUpdate && !this.shouldComponentUpdate(this.props,this.state)){
+      return;
+    }
+    this.UNSAFE_componentWillUpdate();
+    updateComponent(this);
+    this.componentDidUpdate();
   }
 }
 
