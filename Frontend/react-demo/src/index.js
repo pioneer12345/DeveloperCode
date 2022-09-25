@@ -1,84 +1,149 @@
-import React from 'react'; 
-import ReactDOM from 'react-dom';
+/*
+ * @Author: Chen Ma ma_chenn@163.com
+ * @Date: 2022-09-09 13:38:32
+ * @LastEditors: Chen Ma ma_chenn@163.com
+ * @LastEditTime: 2022-09-25 10:20:04
+ * @FilePath: \react-demo\src\index.js
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
+import React from "react";
+import ReactDOM from "react-dom";
+// import ThemeContext from "./context";
 
-class Counter extends React.Component{
-  static defaultProps = {name:"测试"};
-  constructor(props){
-    super(props);
-    this.props = props;
-    this.state = {number:0};
-    console.log('1.开始初始化！');
+function createContext(){
+  let value;
+  function Provider(props){
+    Provider.value = props.value;
+    return props.children;
   }
 
-  UNSAFE_componentWillMount(){
-    console.log('2.组件将要挂载！');
+  function Consumer(props){
+    return props.children(Provider.value);
   }
 
-  componentDidMount(){
-    console.log('4.组件挂载完成！');
-  }
+  return {Provider,Consumer};
+}
 
-  shouldComponentUpdate(nextProps,nextState){
-    return true;
-    console.log('5.询问组件是否应该更新！');
-    return nextState.number % 2 == 0;
-  }
-  
-  handleClick = ()=>{
-    this.setState({number:this.state.number+1});
-  }
-
-  UNSAFE_componentWillUpdate(){
-    console.log('6.组件将要更新！');
-  }
-
-  render(){
-    console.log('3.组件开始渲染！');
+let ThemeContext  = React.createContext();
+class Main extends React.Component {
+  render() {
+    console.log('1'+this.props.changeColor);
     return (
-      <div>
-        <p>{this.state.number}</p>
-        <button onClick={this.handleClick}>+</button>
-        <hr></hr>
-        {this.state.number>100?null:<SubCounter count={this.state.number} />}
+      <div
+        style={{
+          margin: "10px",
+          border: `5px solid ${this.props.color}`,
+          padding: "5px",
+        }}
+      >
+        Main
+        <Content changeColor={this.props.changeColor} color={this.props.color} />
       </div>
     );
   }
-
-  componentDidUpdate(){
-    console.log('7.组件更新完成！');
-  }
-
 }
 
-class SubCounter extends React.Component{
+class Content extends React.Component {
+  static contextType = ThemeContext
+  render() {
+    console.log('2'+this.props.changeColor);
+    return (
+      <div
+        style={{
+          margin: "10px",
+          border: `5px solid ${this.props.color}`,
+          padding: "5px",
+        }}
+      >
+        Content
+        <button onClick={() => this.context.changeColor('red')}>红</button>
+        <button onClick={() => this.context.changeColor('green')}>绿</button>
+      </div>
+    );
+  }
+}
 
-  constructor(props){
+class Header extends React.Component {
+  render() {
+    return (
+      <div
+        style={{
+          margin: "10px",
+          border: `5px solid ${this.props.color}`,
+          padding: "5px",
+        }}
+      >
+        Header
+        <Title changeColor={this.props.changeColor} color={this.props.color} />
+      </div>
+    );
+  }
+}
+
+// class Title extends React.Component {
+//   render() {
+//     return (
+//       <div
+//         style={{
+//           margin: "10px",
+//           border: `5px solid ${this.props.color}`,
+//           padding: "5px",
+//         }}
+//       >
+//         Title
+//       </div>
+//     );
+//   }
+// }
+
+function Title(props){
+  return(
+    <ThemeContext.Consumer>
+      {
+        value =>(
+          <div
+          style={{
+            margin: "10px",
+            border: `5px solid ${value.color}`,
+            padding: "5px",
+          }}>
+          Title
+        </div>
+        )
+      }
+    </ThemeContext.Consumer>
+  )
+}
+
+class Panel extends React.Component {
+  constructor(props) {
     super(props);
-    this.state = {count:0};
+    this.state = { color: "red" };
   }
 
-  componentWillReceiveProps(){
-    console.log("1. 组件接收到属性");
-  }
+  changeColor = (color) => {
+    this.setState({ color });
+  };
 
-  static getDerivedStateFromProps(nextProps,prevState){
-    console.log("3. 从属性中获取继承的状态");
-    let {count} = nextProps;
-    return {count:prevState.count + count};
-  }
-
-  render(){
-    console.log("2. 组件开始渲染");
-    return(
-      <div>
-        {this.state.count}
+  render() {
+    let value = {color:this.state.color,changeColor:this.changeColor};
+    return (
+      <ThemeContext.Provider value = {value}>
+        <div
+        style={{
+          margin: "10px",
+          border: `5px solid ${this.state.color}`,
+          padding: "5px",
+          width: "200px",
+        }}
+      >
+        Panel
+        <Header changeColor={this.changeColor} color={this.state.color} />
+        <Main changeColor={this.changeColor} color={this.state.color} />
       </div>
+      </ThemeContext.Provider>
     );
-  }
-
-  componentWillUnmount(){
-    console.log('3.组件将要卸载');
   }
 }
 
-ReactDOM.render(<Counter />,document.getElementById('root'));
+ReactDOM.render(<Panel />, document.getElementById("root"));
