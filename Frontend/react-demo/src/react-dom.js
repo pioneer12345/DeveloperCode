@@ -1,6 +1,32 @@
+
 export function updateComponent(componentInstance){
     let element = componentInstance.render();
     let {type,props} = element;
+    while(typeof type == 'function'){
+        let isReactComponent = type.isReactComponent;
+        if(isReactComponent){
+            componentInstance = new type(props);
+            if(componentInstance.UNSAFE_componentWillMount) componentInstance.UNSAFE_componentWillMount();
+            element = componentInstance.render();
+            if(type.contextType){
+                componentInstance.context = type.contextType.Provider.value;
+            }
+            element = Array.isArray(element)?element[0]:element;
+            type = element.type;
+            props = element.props;
+        }
+        else if(typeof type =='function'){
+            element = type(props);
+            element = Array.isArray(element)?element[0]:element;
+            type = element.type;
+            props = element.props;
+        }
+    }
+    // if(typeof type == 'function'){
+    //     let parentNode = componentInstance.dom.parentNode;
+    //     parentNode.removeChild(componentInstance.dom);
+    //     return render(element,parentNode,componentInstance);
+    // }
     let dom  = createDOM(type,props,componentInstance);
     componentInstance.dom.parentNode.replaceChild(dom,componentInstance.dom);
     componentInstance.dom = dom;
@@ -17,18 +43,28 @@ function render(element,container,componentInstance){
         if(props.ref1){
             props.ref1.current = componentInstance;
         }
+        if(type.contextType){
+            componentInstance.context = type.contextType.Provider.value;
+        }
         if(componentInstance.UNSAFE_componentWillMount) componentInstance.UNSAFE_componentWillMount();
         element = componentInstance.render();
+        element = Array.isArray(element)?element[0]:element;
         type = element.type;
         props = element.props;
     }
     else if(typeof type =='function'){
         element = type(props);
+        element = Array.isArray(element)?element[0]:element;
         type = element.type;
         props = element.props;
     }
+
+    if(typeof type == 'function'){
+        return render(element,container,componentInstance);
+    }
+
     let dom = createDOM(type,props,componentInstance);
-    if(isReactComponent && componentInstance){
+    if(componentInstance){
         componentInstance.dom = dom;   
     }
     container.appendChild(dom);
@@ -89,7 +125,7 @@ function createDOM(type,props,componentInstance){
             dom.setAttribute(propName,props[propName]);
         }    
     }
-    if(props.ref1)
+    if(props && props.ref1)
     {
         if(typeof props.ref1 == 'string'){
             componentInstance.refs[props.ref1] = dom;
