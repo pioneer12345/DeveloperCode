@@ -2,148 +2,124 @@
  * @Author: Chen Ma ma_chenn@163.com
  * @Date: 2022-09-09 13:38:32
  * @LastEditors: Chen Ma ma_chenn@163.com
- * @LastEditTime: 2022-09-25 10:20:04
+ * @LastEditTime: 2022-09-26 14:48:21
  * @FilePath: \react-demo\src\index.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import React from "react";
 import ReactDOM from "react-dom";
-// import ThemeContext from "./context";
 
-function createContext(){
-  let value;
-  function Provider(props){
-    Provider.value = props.value;
-    return props.children;
-  }
+// function WithLogger(OldComponent){
+//   return class extends React.Component{
+//     start = null;
 
-  function Consumer(props){
-    return props.children(Provider.value);
-  }
+//   UNSAFE_componentWillMount(){
+//     this.start = Date.now();
+//   }
 
-  return {Provider,Consumer};
-}
+//   componentDidMount(){
+//     console.log(Date.now()- this.start);
+//   }
 
-let ThemeContext  = React.createContext();
-class Main extends React.Component {
-  render() {
-    console.log('1'+this.props.changeColor);
-    return (
-      <div
-        style={{
-          margin: "10px",
-          border: `5px solid ${this.props.color}`,
-          padding: "5px",
-        }}
-      >
-        Main
-        <Content changeColor={this.props.changeColor} color={this.props.color} />
-      </div>
-    );
-  }
-}
+//   render(){
+//     return <OldComponent {...this.props} />
+//   }
+//   } 
+// }
 
-class Content extends React.Component {
-  static contextType = ThemeContext
-  render() {
-    console.log('2'+this.props.changeColor);
-    return (
-      <div
-        style={{
-          margin: "10px",
-          border: `5px solid ${this.props.color}`,
-          padding: "5px",
-        }}
-      >
-        Content
-        <button onClick={() => this.context.changeColor('red')}>红</button>
-        <button onClick={() => this.context.changeColor('green')}>绿</button>
-      </div>
-    );
-  }
-}
+// class Hello extends React.Component{
 
-class Header extends React.Component {
-  render() {
-    return (
-      <div
-        style={{
-          margin: "10px",
-          border: `5px solid ${this.props.color}`,
-          padding: "5px",
-        }}
-      >
-        Header
-        <Title changeColor={this.props.changeColor} color={this.props.color} />
-      </div>
-    );
-  }
-}
-
-// class Title extends React.Component {
-//   render() {
-//     return (
-//       <div
-//         style={{
-//           margin: "10px",
-//           border: `5px solid ${this.props.color}`,
-//           padding: "5px",
-//         }}
-//       >
-//         Title
-//       </div>
+//   render(){
+//     return(
+//       <div>Hello {this.props.id}</div>
 //     );
 //   }
 // }
 
-function Title(props){
-  return(
-    <ThemeContext.Consumer>
-      {
-        value =>(
-          <div
-          style={{
-            margin: "10px",
-            border: `5px solid ${value.color}`,
-            padding: "5px",
-          }}>
-          Title
-        </div>
-        )
-      }
-    </ThemeContext.Consumer>
-  )
-}
+// let NewHello = WithLogger(Hello);
 
-class Panel extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { color: "red" };
+
+function fromLocalStorage(OldComponent,filedName){
+  return class extends React.Component{
+  
+  state ={value:''}  
+
+  componentDidMount(){
+    let value = localStorage.getItem(filedName);
+    this.setState({value});
   }
 
-  changeColor = (color) => {
-    this.setState({ color });
-  };
+  handleChange = (event)=>{
+    console.log('1');
+    localStorage.setItem(filedName,event.target.value);
+    this.setState({value:event.target.value});
+  }
 
-  render() {
-    let value = {color:this.state.color,changeColor:this.changeColor};
-    return (
-      <ThemeContext.Provider value = {value}>
-        <div
-        style={{
-          margin: "10px",
-          border: `5px solid ${this.state.color}`,
-          padding: "5px",
-          width: "200px",
-        }}
-      >
-        Panel
-        <Header changeColor={this.changeColor} color={this.state.color} />
-        <Main changeColor={this.changeColor} color={this.state.color} />
-      </div>
-      </ThemeContext.Provider>
-    );
+  render(){
+    return (<OldComponent value ={this.state.value} />);
+  }
   }
 }
 
-ReactDOM.render(<Panel />, document.getElementById("root"));
+
+function fromAjax(OldComponent){
+  return class extends React.Component{
+
+    state ={value:''};
+
+    componentDidMount(){
+      fetch('/dict.json').then(response=>response.json()).then(data=>{
+        let value = data[this.props.value];
+        this.setState({value});
+      });
+    }
+
+    render(){
+      return (<OldComponent value={this.state.value}/>);
+    }
+  }
+}
+
+// class UserName extends React.Component{
+
+//   // state = {value:''};
+
+//   // componentDidMount(){
+//   //   let value = localStorage.getItem('username');
+//   //   this.setState({value});
+//   // }
+
+
+//   // onChange=(event)=>{
+//   //   this.setState({value:event.target.value});
+//   // }
+
+//   render(){
+//     return (<input value={this.props.value} onChange={this.props.handleChange}></input>)
+//   }
+// }
+
+
+class Filed extends React.Component{
+
+  // state = {value:''};
+
+  // componentDidMount(){
+  //   let value = localStorage.getItem('password');
+  //   this.setState({value});
+  // }
+
+
+  // onChange=(event)=>{
+  //   this.setState({value:event.target.value});
+  // }
+
+  render(){
+    return (<input defaultValue={this.props.value}></input>)
+  }
+}
+
+const AjaxUserName = fromAjax(Filed);
+const LocalUserName = fromLocalStorage(AjaxUserName,'username');
+
+ReactDOM.render(<><LocalUserName/></>, document.getElementById("root"));
