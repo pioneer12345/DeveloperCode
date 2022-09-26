@@ -31,9 +31,9 @@ export class Component{
     if(this.shouldComponentUpdate && !this.shouldComponentUpdate(this.props,this.state)){
       return;
     }
-    this.UNSAFE_componentWillUpdate();
+    // this.UNSAFE_componentWillUpdate();
     updateComponent(this);
-    this.componentDidUpdate();
+    // this.componentDidUpdate();
   }
 }
 
@@ -57,4 +57,18 @@ export function createElement(type,config = {},...children){
     }
 }
 
-export default {createElement,Component,createRef,forwardRef}
+export function createContext(){
+  function Provider(props){
+    Provider.value = props.value;
+    return Array.isArray(props.children)?props.children[0]:props.children;
+  }
+
+  function Consumer(props){
+    let children = Array.isArray(props.children)?props.children[0]:props.children;
+    return children(Provider.value);
+  }
+
+  return {Provider,Consumer};
+}
+
+export default {createElement,Component,createRef,forwardRef,createContext}

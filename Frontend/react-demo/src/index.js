@@ -6,59 +6,64 @@
  * @FilePath: \react-demo\src\index.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
-import React from "react";
-import ReactDOM from "react-dom";
+import React from "./react";
+import ReactDOM from "./react-dom";
 // import ThemeContext from "./context";
-
-function createContext(){
-  let value;
-  function Provider(props){
-    Provider.value = props.value;
-    return props.children;
-  }
-
-  function Consumer(props){
-    return props.children(Provider.value);
-  }
-
-  return {Provider,Consumer};
-}
 
 let ThemeContext  = React.createContext();
 class Main extends React.Component {
+  static contextType = ThemeContext;
   render() {
-    console.log('1'+this.props.changeColor);
     return (
-      <div
-        style={{
-          margin: "10px",
-          border: `5px solid ${this.props.color}`,
-          padding: "5px",
-        }}
-      >
-        Main
-        <Content changeColor={this.props.changeColor} color={this.props.color} />
-      </div>
-    );
+            <div
+            style={{
+              margin: "10px",
+              border: `5px solid ${this.context.color}`,
+              padding: "5px",
+            }}>
+          Main
+          <Content changeColor={this.context.changeColor} color={this.context.color} />
+          </div>
+    //   <ThemeContext.Consumer>
+    //   {
+    //     value =>(
+    //       <div
+    //       style={{
+    //         margin: "10px",
+    //         border: `5px solid ${value.color}`,
+    //         padding: "5px",
+    //       }}>
+    //     Main
+    //     <Content changeColor={value.changeColor} color={value.color} />
+    //     </div>
+    //     )
+    //   }
+    // </ThemeContext.Consumer>
+    )
   }
 }
 
 class Content extends React.Component {
   static contextType = ThemeContext
   render() {
-    console.log('2'+this.props.changeColor);
     return (
-      <div
-        style={{
-          margin: "10px",
-          border: `5px solid ${this.props.color}`,
-          padding: "5px",
-        }}
-      >
-        Content
-        <button onClick={() => this.context.changeColor('red')}>红</button>
-        <button onClick={() => this.context.changeColor('green')}>绿</button>
-      </div>
+
+      <ThemeContext.Consumer>
+      {
+        value =>(
+          <div
+          style={{
+            margin: "10px",
+            border: `5px solid ${value.color}`,
+            padding: "5px",
+          }}>
+          Content
+        <button onClick={() => value.changeColor('red')}>红</button>
+        <button onClick={() => value.changeColor('green')}>绿</button>
+        </div>
+        )
+      }
+    </ThemeContext.Consumer>
     );
   }
 }
@@ -66,16 +71,30 @@ class Content extends React.Component {
 class Header extends React.Component {
   render() {
     return (
-      <div
-        style={{
-          margin: "10px",
-          border: `5px solid ${this.props.color}`,
-          padding: "5px",
-        }}
-      >
-        Header
-        <Title changeColor={this.props.changeColor} color={this.props.color} />
-      </div>
+      <ThemeContext.Consumer>
+      {
+        value =>(
+          <div
+          style={{
+            margin: "10px",
+            border: `5px solid ${value.color}`,
+            padding: "5px",
+          }}>
+          Title
+        </div>
+        )
+      }
+    </ThemeContext.Consumer>
+      // <div
+      //   style={{
+      //     margin: "10px",
+      //     border: `5px solid ${value.color}`,
+      //     padding: "5px",
+      //   }}
+      // >
+      //   Header
+      //   <Title changeColor={value.changeColor} color={value.color} />
+      // </div>
     );
   }
 }
@@ -86,7 +105,7 @@ class Header extends React.Component {
 //       <div
 //         style={{
 //           margin: "10px",
-//           border: `5px solid ${this.props.color}`,
+//           border: `5px solid ${value.color}`,
 //           padding: "5px",
 //         }}
 //       >
@@ -138,8 +157,8 @@ class Panel extends React.Component {
         }}
       >
         Panel
-        <Header changeColor={this.changeColor} color={this.state.color} />
-        <Main changeColor={this.changeColor} color={this.state.color} />
+        <Header />
+        <Main />
       </div>
       </ThemeContext.Provider>
     );
