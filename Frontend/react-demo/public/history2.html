@@ -1,0 +1,51 @@
+<!--
+ * @Author: Chen Ma ma_chenn@163.com
+ * @Date: 2022-09-27 10:16:21
+ * @LastEditors: Chen Ma ma_chenn@163.com
+ * @LastEditTime: 2022-09-27 10:51:32
+ * @FilePath: \react-demo\public\hash.html
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="root"></div>
+    <script>
+        let root = document.getElementById('root');
+        console.log(history);
+        let lastHistorylength = history.length;
+        setTimeout(()=>{
+            history.pushState({page:1},'title1','/page1');
+        },1000);
+
+        setTimeout(()=>{
+            history.pushState({page:2},'title2','/page2');
+        },2000);
+
+        setTimeout(()=>{
+            history.pushState({page:3},'title3','/page3');
+        },3000);
+
+        setTimeout(()=>{
+            history.replaceState({page:4},'title4','/page4');
+        },4000);
+
+        setTimeout(()=>{
+            history.go(-1);
+            console.log(history.length - lastHistorylength);
+        },5000);
+
+        setTimeout(()=>{
+            history.go(1);
+            console.log(history.length - lastHistorylength);
+        },6000);
+
+    </script>
+</body>
+</html>
